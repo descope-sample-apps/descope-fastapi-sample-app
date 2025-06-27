@@ -41,7 +41,7 @@ def private_scoped(auth_result: str = Security(auth, scopes=['read:messages'])):
 
     Access to this endpoint requires:
     - A valid access token (authentication), and
-    - The presence of the 'read:messages' scope in the token.
+    - The presence of the `read:messages` scope in the token.
     """
     return auth_result
 
@@ -52,7 +52,7 @@ def private_scoped(auth_result: str = Security(auth, scopes=['read:messages', 'w
 
     Access to this endpoint requires:
     - A valid access token (authentication), and
-    - The presence of the 'read:messages' and 'write:messages' scope in the token.
+    - The presence of the `read:messages` and `write:messages` scope in the token.
     """
     return auth_result
 
@@ -63,6 +63,6 @@ def private_scoped(auth_result: str = Security(auth, scopes=['delete:messages'])
 
     Access to this endpoint requires:
     - A valid access token (authentication), and
-    - The presence of the 'delete:messages' scope in the token.
+    - The presence of the `delete:messages` scope in the token.
     """
     return auth_result
