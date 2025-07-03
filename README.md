@@ -12,8 +12,8 @@ This starter is ideal for integrating Descope-authenticated clients (like web/mo
 To setup this project locally, follow the steps below:
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/<your-repo-name>.git
-cd <your-repo-name>
+git clone https://github.com/descope-sample-apps/descope-fastapi-sample-app
+cd descope-fastapi-sample-app
 ```
 ### 2. Create and Activate a Virtual Environment
 ```bash
@@ -75,43 +75,49 @@ curl -X 'GET' \
   -H 'Authorization: Bearer <YOUR_TOKEN_WITH_SCOPES>'
 ```
 
-## Testing the Authenticated Route (`/api/private`)
+## Testing the Authenticated Routes 
+The application has 4 routes which require authentication:
+- `/api/private`: Requires valid Authentication Token (no specific scopes)
+- `/api/private-scoped/readonly`: Requires valid Token with scope `read:messages`
+- `/api/private-scoped/write`: Requires valid Token with scope `write:messages`
+- `/api/private-scoped/delete`: Requires valid Token with scope: `delete:messages`
 
-If you open: http://localhost:8000/api/private **without** providing an authorization token, you will receive a `401 Unauthorized` error.
+If you open any of the above routes **without** providing an authorization token, you will receive a `401 Unauthorized` error.
 
-To obtain a valid token for testing:
-1. Visit [Descope Explorer](https://explorer.descope.com) in your browser.
-2. Click the **⚙️ Settings** icon in the top-right corner.
-3. Enter your **Project ID** and **Flow ID**.
-4. You can now run your authentication flow directly in the browser.
-5. After completing the login process, your **session JWT token** will be displayed in the Explorer UI.
+If you open a scoped route without a token containing the required scope, you will receive a `403 Forbidden Error`, indicating the missing scopes.
 
-You can then copy this token and:
-- Paste it into the **Authorization header** of your requests in Postman.
-- Alternatively, use it in `curl` commands as shown in the section on Calling the Server.
+**Note**:
+The only difference between testing `/api/private` and the scoped routes is whether you include scopes when requesting the token. If you leave the Scope field empty, the token will authenticate successfully for `/api/private` but will be rejected for the scoped routes.
 
-## Testing the Authenticated Route with Scopes (`/api/private-scoped/*`)
-If you open any of the scoped routes (`/private-scoped/*`) such as http://localhost:8000/api/private-scoped/readonly with a token **that does not include the required scopes**, you will receive a `403 Forbidden` error indicating missing permissions.
+You can obtain a valid token for testing:
 
-To issue tokens containing scopes for testing:
+## Testing with [PostMan](https://www.postman.com/)
+### Getting an Authorization Token
+Before you test the private routes, you must have a valid Authorization Token. To fetch this token using Postman, follow the following steps:
+1. Open [Postman](https://www.postman.com/), and in a new request tab, click the `Authorization` tab. 
+2. Under Type, select **OAuth 2.0**. Scroll down to the Configure New Token section.In this tab, scroll down to the section on 'Configure New Token'
+3. Fill in the following fields:
+  - **Token Name**: any name to describe your token, e.g., 'Descope OAuth Token'
+  - **Grant Type**: 'Authorization Code'
+  - **Callback URL**: https://oauth.pstmn.io/v1/callback (to redirect back into Postman)
+  - **Auth URL**: https://api.descope.com/oauth2/v1/authorize
+  - **Access Token URL**: https://api.descope.com/oauth2/v1/token
+  - **Client ID**: your [Descope Inbound App](https://app.descope.com/apps/inbound) Client ID
+  - **Client Secret**: your [Descope Inbound App](https://app.descope.com/apps/inbound) Client Secret (**Note**: It's recommended to store this as a Postman secret)
+  - **state**: any random string, e.g., 'test123'
 
-1. Log in to your [Descope Console](https://app.descope.com/).
-2. Navigate to **Project Settings > JWT Templates**: [JWT Templates](https://app.descope.com/settings/project/jwt)
-3. Click the **➕ JWT Template** button to create a new template.
-4. Under **Custom Claims**, add a new claim:
-- **Key:** `scope`
-- **Type:** `string`
-- **Value:** A space-separated list of scopes, for example:
-  ```
-  read:messages write:messages
-  ```
-  or
-  ```
-  delete:messages
-  ```
-5. Click **Save** to create the template.
-6. Next, go to the [**Session Management** settings](https://app.descope.com/settings/project/session):
-7. Under **Token Format > User JWT**, select the JWT template you created above.
-8. Click **Save** to apply the changes.
+![App Screenshot](./app/assets/postman.png)
 
-After updating your session configuration, new tokens issued via your flow will include the specified scopes, allowing you to successfully call all scoped routes.
+5. If you are testing the scoped API routes, fill in **'Scope'** field with your desired scopes (`read:messages`, `write:messages`, `delete:messages`), as a **space-separated string**. If you are only testing `/api/private`, you can leave the Scope field empty.
+6. Click **Get New Access Token**. A window will open, prompting you to authenticate.
+7. After completing the login and granting consent, Postman will display the access token.
+7. Click Use Token to attach the token to your request. You can now use this Authorization token for the private routes.
+
+### Testing the Routes in Postman
+1. In your request tab, set the method to GET.
+2. Enter the URL of the route you want to test, for example: http://localhost:8000/api/private or http://localhost:8000/api/private-scoped/readonly
+3. Ensure the Authorization Type is set to Bearer Token and that the token field contains your valid access token.
+4. Click Send.
+
+If the token is valid and contains the required scopes (for scoped routes), you will receive a 200 OK response with the protected resource or message.
+

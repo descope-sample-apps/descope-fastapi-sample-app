@@ -45,7 +45,8 @@ class TokenVerifier:
                 token,
                 key,
                 algorithms=self.allowed_algorithms,
-                issuer=self.config.issuer
+                issuer=self.config.issuer_candidates,
+                audience=self.config.audience
             )
         except Exception as e:
             raise UnauthorizedException(f"Token decoding failed: {str(e)}")
