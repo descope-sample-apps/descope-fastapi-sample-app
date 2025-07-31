@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Security
-from app.utils import TokenVerifier
+from app.auth import TokenVerifier
 
 import urllib.request
 
