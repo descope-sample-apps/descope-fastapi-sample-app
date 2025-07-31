@@ -100,8 +100,8 @@ Before you test the private routes, you must have a valid Authorization Token. T
   - **Token Name**: any name to describe your token, e.g., 'Descope OAuth Token'
   - **Grant Type**: 'Authorization Code'
   - **Callback URL**: https://oauth.pstmn.io/v1/callback (to redirect back into Postman)
-  - **Auth URL**: https://api.descope.com/oauth2/v1/authorize
-  - **Access Token URL**: https://api.descope.com/oauth2/v1/token
+  - **Auth URL**: Find it under Connection Information -> 'Authorization URL' in your [Descope Inbound App](https://app.descope.com/apps/inbound)
+  - **Access Token URL**: Find it under Connection Information -> 'Token URL' in your [Descope Inbound App](https://app.descope.com/apps/inbound)
   - **Client ID**: your [Descope Inbound App](https://app.descope.com/apps/inbound) Client ID
   - **Client Secret**: your [Descope Inbound App](https://app.descope.com/apps/inbound) Client Secret (**Note**: It's recommended to store this as a Postman secret)
   - **state**: any random string, e.g., 'test123'
