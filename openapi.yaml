@@ -1,0 +1,233 @@
+openapi: 3.1.0
+info:
+  title: Descope FastAPI Sample App
+  description: |
+    A Python FastAPI starter project for a backend server that demonstrates how to secure APIs using Descope authentication.
+    
+    This API provides both public and protected endpoints with scope-based access control.
+    
+    ## Authentication
+    Protected endpoints require a valid JWT access token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## Scopes
+    The following scopes are used for authorization:
+    - `read:messages` - Required for read-only operations
+    - `write:messages` - Required for write operations  
+    - `delete:messages` - Required for delete operations
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: https://github.com/descope-sample-apps/descope-fastapi-sample-app
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /api/public:
+    get:
+      operationId: getPublicEndpoint
+      summary: Public endpoint
+      description: |
+        Public Route: No Authentication required.
+        
+        This endpoint is accessible without any authentication or authorization.
+      tags:
+        - Public
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  msg:
+                    type: string
+                    example: "Success! This endpoint is publicly available and requires no authentication."
+
+  /api/private:
+    get:
+      operationId: getPrivateEndpoint
+      summary: Protected endpoint
+      description: |
+        This is a protected route.
+        
+        Access to this endpoint requires a valid JWT access token.
+        The `auth` dependency uses FastAPI's `Security` to perform token verification before entering this route.
+      tags:
+        - Private
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response with authenticated user data
+          content:
+            application/json:
+              schema:
+                type: object
+                description: JWT payload containing user information and claims
+                additionalProperties: true
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/private-scoped/readonly:
+    get:
+      operationId: getReadOnlyEndpoint
+      summary: Read-only protected endpoint
+      description: |
+        This is a protected route with scope-based access control.
+        
+        Access to this endpoint requires:
+        - A valid access token (authentication), and
+        - The presence of the `read:messages` scope in the token.
+      tags:
+        - Scoped
+      security:
+        - bearerAuth: ['read:messages']
+      responses:
+        '200':
+          description: Successful response with authenticated user data
+          content:
+            application/json:
+              schema:
+                type: object
+                description: JWT payload containing user information and claims
+                additionalProperties: true
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - missing required scope 'read:messages'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/private-scoped/write:
+    get:
+      operationId: getWriteEndpoint
+      summary: Write protected endpoint
+      description: |
+        This is a protected route with scope-based access control.
+        
+        Access to this endpoint requires:
+        - A valid access token (authentication), and
+        - The presence of the `read:messages` and `write:messages` scope in the token.
+      tags:
+        - Scoped
+      security:
+        - bearerAuth: ['read:messages', 'write:messages']
+      responses:
+        '200':
+          description: Successful response with authenticated user data
+          content:
+            application/json:
+              schema:
+                type: object
+                description: JWT payload containing user information and claims
+                additionalProperties: true
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - missing required scopes 'read:messages' and/or 'write:messages'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/private-scoped/delete:
+    get:
+      operationId: getDeleteEndpoint
+      summary: Delete protected endpoint
+      description: |
+        This is a protected route with scope-based access control.
+        
+        Access to this endpoint requires:
+        - A valid access token (authentication), and
+        - The presence of the `delete:messages` scope in the token.
+      tags:
+        - Scoped
+      security:
+        - bearerAuth: ['delete:messages']
+      responses:
+        '200':
+          description: Successful response with authenticated user data
+          content:
+            application/json:
+              schema:
+                type: object
+                description: JWT payload containing user information and claims
+                additionalProperties: true
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - missing required scope 'delete:messages'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token obtained from Descope authentication.
+        
+        The token should be included in the Authorization header as:
+        ```
+        Authorization: Bearer <your-jwt-token>
+        ```
+        
+        The token must be issued by a valid Descope project and contain the required scopes for protected endpoints.
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: "Authentication required"
+      required:
+        - detail
+
+tags:
+  - name: Public
+    description: Endpoints that don't require authentication
+  - name: Private
+    description: Endpoints that require authentication but no specific scopes
+  - name: Scoped
+    description: Endpoints that require authentication and specific scopes 
