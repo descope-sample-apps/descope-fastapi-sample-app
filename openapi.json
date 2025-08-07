@@ -1,0 +1,151 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "description": "Root endpoint that serves a welcome page.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public": {
+      "get": {
+        "summary": "Public",
+        "description": "Public Route: No Authentication required.",
+        "operationId": "public_api_public_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/private": {
+      "get": {
+        "summary": "Private",
+        "description": "This is a protected route.\n\nAccess to this endpoint requires a valid JWT access token.\nThe `auth` dependency uses FastAPI's `Security` to perform token verification before entering this route.",
+        "operationId": "private_api_private_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/private-scoped/readonly": {
+      "get": {
+        "summary": "Private Scoped",
+        "description": "This is a protected route with scope-based access control.\n\nAccess to this endpoint requires:\n- A valid access token (authentication), and\n- The presence of the `read:messages` scope in the token.",
+        "operationId": "private_scoped_api_private_scoped_readonly_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/private-scoped/write": {
+      "get": {
+        "summary": "Private Scoped",
+        "description": "This is a protected route with scope-based access control.\n\nAccess to this endpoint requires:\n- A valid access token (authentication), and\n- The presence of the `read:messages` and `write:messages` scope in the token.",
+        "operationId": "private_scoped_api_private_scoped_write_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/private-scoped/delete": {
+      "get": {
+        "summary": "Private Scoped",
+        "description": "This is a protected route with scope-based access control.\n\nAccess to this endpoint requires:\n- A valid access token (authentication), and\n- The presence of the `delete:messages` scope in the token.",
+        "operationId": "private_scoped_api_private_scoped_delete_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
