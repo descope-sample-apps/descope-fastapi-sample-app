@@ -4,6 +4,11 @@
     "title": "FastAPI",
     "version": "0.1.0"
   },
+  "servers": [
+    {
+      "url": "https://<Your base URL>"
+    }
+  ],
   "paths": {
     "/": {
       "get": {
